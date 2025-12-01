@@ -1,88 +1,50 @@
 package de.htwg.in.schneider.saitenweise.backend.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import de.htwg.in.schneider.saitenweise.backend.model.Category;
 import de.htwg.in.schneider.saitenweise.backend.model.Product;
-import de.htwg.in.schneider.saitenweise.backend.repository.ProductRepository;
 
-import org.springframework.http.ResponseEntity;
-
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProductController.class);
-
-    @Autowired
-    private ProductRepository productRepository;
-
     @GetMapping
-    public List<Product> getProducts(@RequestParam(required = false) String name, 
-        @RequestParam(required = false) Category category) {
-        if (name != null && category != null) {
-            return productRepository.findByTitleContainingIgnoreCaseAndCategory(name, category);
-        } else if (name != null) {
-            return productRepository.findByTitleContainingIgnoreCase(name);
-        } else if (category != null) {
-            return productRepository.findByCategory(category);
-        } else {
-            return productRepository.findAll();
-        }
-    }
+    public List<Product> getProducts() {
+        Product p1 = new Product();
+        p1.setId(1);
+        p1.setTitle("IT-Landschaftscheck");
+        p1.setDescription("Ihre aktuell verwendete IT-Landschaft und verwendeten Programme werden von unseren Experten analysiert und geprüft. Hier werden mögliche Schnittstellen identifiziert, die Ihr Potenzial maximieren.");
+        p1.setCategory(Category.PACKAGES);
+        p1.setPrice(500.0);
+        //p1.setImageUrl("https://neshanjo.github.io/saitenweise-images/violin_pro.jpg");
 
-    @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        if (product.getId() != null) {
-            product.setId(null);
-            LOG.warn("Attempted to create a product with an existing ID. ID has been set to null to create a new product.");
-        }
-        Product newProduct = productRepository.save(product);
-        LOG.info("Created new product with id " + newProduct.getId());
-        return newProduct;
-    }
+        Product p2 = new Product();
+        p2.setId(2);
+        p2.setTitle("Mockup-Erstellung 4h");
+        p2.setDescription("Wir erstellen ein interaktives Mockup Ihrer zukünftigen Webanwendung, um Design und Funktionalität zu visualisieren.");
+        p2.setCategory(Category.FRONTEND);
+        p2.setPrice(400.0);
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
-        Optional<Product> opt = productRepository.findById(id);
-        if (!opt.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        Product product = opt.get();
-        product.setCategory(productDetails.getCategory());
-        product.setDescription(productDetails.getDescription());
-        product.setImageUrl(productDetails.getImageUrl());
-        product.setPrice(productDetails.getPrice());
-        product.setTitle(productDetails.getTitle());
-        Product updatedProduct = productRepository.save(product);
-        LOG.info("Updated product with id " + updatedProduct.getId());
-        return ResponseEntity.ok(updatedProduct);
-    }
+        Product p3 = new Product();
+        p3.setId(10);
+        p3.setTitle("Projektmanagement Coaching 60min");
+        p3.setDescription("Optimieren Sie Ihre Präsentationsfähigkeiten mit unserem Projektmanagement Coaching, um Investoren und Kunden zu überzeugen.");
+        p3.setCategory(Category.COACHING);
+        p3.setPrice(120.0);
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteProduct(@PathVariable Long id) {
-        Optional<Product> opt = productRepository.findById(id);
-        if (!opt.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        productRepository.delete(opt.get());
-        LOG.info("Deleted product with id " + id);
-        return ResponseEntity.noContent().build();
-    }
+        Product p4 = new Product();
+        p4.setId(200);
+        p4.setTitle("Anwendertraining 120min");
+        p4.setDescription("Intensives Training für Anwender, um die Nutzung unserer Software effektiv zu gestalten.");
+        p4.setCategory(Category.COACHING);
+        p4.setPrice(200.0);
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Optional<Product> opt = productRepository.findById(id);
-        if (opt.isPresent()) {
-            return ResponseEntity.ok(opt.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return Arrays.asList(p1, p2, p3, p4);
     }
 }
