@@ -150,4 +150,59 @@ public class TaskControllerTest {
         Optional<Task> deleted = taskRepository.findById(id);
         assertFalse(deleted.isPresent());
     }
+
+    
+    // Iteration 8: Suche und filter
+    
+
+    @Test
+    public void testSearchByTitle() throws Exception {
+        taskRepository.save(new Task("Dokumentation schreiben", "Lucas",
+                "2025-10-01", "2025-10-05", "5", "Erledigt"));
+
+        taskRepository.save(new Task("Mockup erstellen", "Marie",
+                "2025-10-03", "2025-10-11", "9", "Erledigt"));
+
+        mockMvc.perform(get("/api/task").param("title", "Dok"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Dokumentation schreiben"))
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    public void testFilterByStatus() throws Exception {
+        taskRepository.save(new Task("Dokumentation", "Lucas",
+                "2025-10-01", "2025-10-05", "5", "Erledigt"));
+
+        taskRepository.save(new Task("Mockup erstellen", "Marie",
+                "2025-10-03", "2025-10-11", "9", "In Bearbeitung"));
+
+        taskRepository.save(new Task("Login bauen", "Chris",
+                "2025-10-03", "2025-10-04", "2", "In Bearbeitung"));
+
+        mockMvc.perform(get("/api/task").param("status", "In Bearbeitung"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    public void testSearchByTitleAndStatus() throws Exception {
+        taskRepository.save(new Task("Dokumentation", "Lucas",
+                "2025-10-01", "2025-10-05", "5", "Erledigt"));
+
+        taskRepository.save(new Task("Mockup erstellen", "Marie",
+                "2025-10-03", "2025-10-11", "9", "In Bearbeitung"));
+
+        taskRepository.save(new Task("Login bauen", "Chris",
+                "2025-10-03", "2025-10-04", "2", "In Bearbeitung"));
+
+        mockMvc.perform(get("/api/task")
+                .param("title", "Login")
+                .param("status", "In Bearbeitung"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Login bauen"))
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    
 }

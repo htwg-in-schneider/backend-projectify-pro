@@ -21,8 +21,29 @@ public class TaskController {
 
     
     @GetMapping
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public ResponseEntity<List<Task>> getTasks(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String status) {
+
+        // Kein Filter gesetzt
+        if ((title == null || title.isBlank()) && (status == null || status.isBlank())) {
+            return ResponseEntity.ok(taskRepository.findAll());
+        }
+
+        // Nur nach Titel suchen
+        if (title != null && !title.isBlank() && (status == null || status.isBlank())) {
+            return ResponseEntity.ok(taskRepository.findByTitleContainingIgnoreCase(title));
+        }
+
+        // Nur nach Status filtern
+        if ((title == null || title.isBlank()) && status != null && !status.isBlank()) {
+            return ResponseEntity.ok(taskRepository.findByStatus(status));
+        }
+
+        // Kombination von beiden
+        return ResponseEntity.ok(
+                taskRepository.findByTitleContainingIgnoreCaseAndStatus(title, status)
+        );
     }
 
     

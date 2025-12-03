@@ -1,9 +1,14 @@
 package de.htwg.in.schneider.saitenweise.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import java.util.List;
+
 
 @Entity
 @Table(name = "task")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Task {
 
     @Id
@@ -12,12 +17,18 @@ public class Task {
 
     private String title;
 
-    @Column(name = "task_user") 
+    @Column(name = "task_user")
     private String user;
+
     private String startDate;
     private String endDate;
     private String duration;
     private String status;
+
+    // 1:n Beziehung Task -> Comment
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Comment> comments;
 
     public Task() {
     }
@@ -52,4 +63,19 @@ public class Task {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public List<Comment> getComments() {return comments;}
+
+    public void setComments(List<Comment> comments) {this.comments = comments;}
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+        comment.setTask(this);
+    }
+
+    public void removeComment(Comment comment) {
+        this.comments.remove(comment);
+        comment.setTask(null);
+    }
+
 }
