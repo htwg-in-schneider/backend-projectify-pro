@@ -77,6 +77,23 @@ public class CommentController {
     }
 
 
+/*     @PutMapping("/{id}")
+    public ResponseEntity<?> updateComment(
+            @PathVariable Long id,
+            @RequestBody Comment updated
+    ) {
+        return commentRepository.findById(id)
+                .map(existing -> {
+                    existing.setUserName(updated.getUserName());
+                    existing.setText(updated.getText());
+                    commentRepository.save(existing);
+                    return ResponseEntity.ok(existing);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+ */
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteComment(@PathVariable Long id) {
 
