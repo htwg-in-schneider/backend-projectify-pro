@@ -47,7 +47,7 @@ public class CommentController {
     }
 
 
-    @PostMapping("/task/{taskId}")
+/*     @PostMapping("/task/{taskId}")
     public ResponseEntity<?> createCommentForTask(
             @PathVariable Long taskId,
             @RequestBody Comment comment) {
@@ -68,9 +68,9 @@ public class CommentController {
 
         return ResponseEntity.status(201).body(saved);
     }
+ */
 
-
-/*     @PostMapping
+    @PostMapping
     public ResponseEntity<?> createComment(@RequestBody Comment comment) {
 
         LOG.info("Attempting to create comment for task id {}",
@@ -98,7 +98,7 @@ public class CommentController {
         LOG.info("Created comment with id {}", saved.getId());
 
         return ResponseEntity.ok(saved);
-    } */
+    }
 
 
 
