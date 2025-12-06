@@ -7,7 +7,7 @@ target/
 ### files with credentials or other sensitive data ###
 application-prod.properties
 application-dev.properties
-application-loal.properties
+application-local.properties
 
 ### STS ###
 .apt_generated
