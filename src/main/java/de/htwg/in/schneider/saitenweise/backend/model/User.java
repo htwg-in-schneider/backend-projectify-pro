@@ -2,7 +2,7 @@ package de.htwg.in.schneider.saitenweise.backend.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "app_user") // <-- Rename table to avoid reserved keyword
+@Table(name = "app_user") 
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -11,7 +11,7 @@ public class User {
     private String name;
     private String oauthId;
 
-    @Enumerated(EnumType.STRING) // <-- Use JPA enum mapping
+    @Enumerated(EnumType.STRING) 
     private Role role;
 
     // Getters and setters
