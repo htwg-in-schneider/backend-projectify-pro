@@ -13,10 +13,10 @@ public class Project {
 
     private Long id;
     private String name;
-    private String status;     // Erledigt, In Bearbeitung, Review
-    private String startDate;  // z.B. "2023-01-01"
-    private String endDate;    // z.B. "2023-12-31"
-    private String duration;   // z.B. "50" (Stunden)
+    private String status;
+    private String startDate;  
+    private String endDate;
+    private String duration;
 
     public Project() {
     }

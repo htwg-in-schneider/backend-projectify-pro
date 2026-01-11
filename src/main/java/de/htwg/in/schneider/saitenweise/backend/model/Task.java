@@ -33,7 +33,10 @@ public class Task {
     //Projects with id
     @Column(name = "project_id")
      private Long projectId;
-        
+    
+     public Task() {
+        // Leerer Konstruktor für Hibernate
+    }
 
     public Task(String title, String user, String startDate, String endDate,
                 String duration, String status) {
