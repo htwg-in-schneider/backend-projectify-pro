@@ -45,7 +45,12 @@ public class TaskController {
     @GetMapping
     public ResponseEntity<List<Task>> getTasks(
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long projectId) {
+
+        if (projectId != null) {
+            return ResponseEntity.ok(taskRepository.findByProjectId(projectId));
+        }
 
         if ((title == null || title.isBlank()) && (status == null || status.isBlank())) {
             return ResponseEntity.ok(taskRepository.findAll());
