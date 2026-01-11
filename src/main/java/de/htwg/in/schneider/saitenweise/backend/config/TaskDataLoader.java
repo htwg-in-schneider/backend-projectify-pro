@@ -16,11 +16,7 @@ public class TaskDataLoader {
 
     @Bean
     public CommandLineRunner loadData(TaskRepository taskRepository, CommentRepository commentRepository) {
-        return args -> {
-            // Wir laden keine Daten mehr automatisch.
-            // Die Datenbank startet leer (oder behält bestehende Daten), 
-            // alles wird über das Frontend (Vue.js) gesteuert.
-            
+        return args -> {           
             LOGGER.info("TaskDataLoader aktiv: Keine initialen Testdaten werden geladen.");
         };
     }
