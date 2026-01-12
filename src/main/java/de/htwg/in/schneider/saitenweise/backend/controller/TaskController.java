@@ -6,6 +6,7 @@ import de.htwg.in.schneider.saitenweise.backend.model.Role;
 import de.htwg.in.schneider.saitenweise.backend.repository.TaskRepository;
 import de.htwg.in.schneider.saitenweise.backend.repository.UserRepository;
 
+import jakarta.validation.Valid; 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -80,7 +81,7 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Task> createTask(
-            @RequestBody Task task,
+            @Valid @RequestBody Task task, 
             @AuthenticationPrincipal Jwt jwt) {
 
         requireAdmin(jwt);
@@ -92,7 +93,7 @@ public class TaskController {
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(
             @PathVariable Long id,
-            @RequestBody Task updated,
+            @Valid @RequestBody Task updated, 
             @AuthenticationPrincipal Jwt jwt) {
 
         requireAdmin(jwt);
@@ -105,6 +106,7 @@ public class TaskController {
                     existing.setEndDate(updated.getEndDate());
                     existing.setDuration(updated.getDuration());
                     existing.setStatus(updated.getStatus());
+                    existing.setProjectId(updated.getProjectId()); 
                     return ResponseEntity.ok(taskRepository.save(existing));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());

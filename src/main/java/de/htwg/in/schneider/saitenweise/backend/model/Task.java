@@ -3,8 +3,10 @@ package de.htwg.in.schneider.saitenweise.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
-
 
 @Entity
 @Table(name = "task")
@@ -15,6 +17,9 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+  
+    @NotBlank(message = "Der Titel der Aufgabe ist ein Pflichtfeld.")
+    @Size(min = 3, max = 100, message = "Der Titel muss zwischen 3 und 100 Zeichen lang sein.")
     private String title;
 
     @Column(name = "task_user")
@@ -22,31 +27,38 @@ public class Task {
 
     private String startDate;
     private String endDate;
+    
+
+    @NotBlank(message = "Die Dauer muss angegeben werden.")
     private String duration;
+
+
+    @NotBlank(message = "Ein Status muss ausgewählt sein.")
     private String status;
 
-    // 1:n Beziehung Task -> Comment
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Comment> comments;
 
-    //Projects with id
     @Column(name = "project_id")
-     private Long projectId;
+    @NotNull(message = "Die Aufgabe muss einem Projekt zugeordnet sein.")
+    private Long projectId;
     
-     public Task() {
-        // Leerer Konstruktor für Hibernate
+    public Task() {
+
     }
 
     public Task(String title, String user, String startDate, String endDate,
-                String duration, String status) {
+                String duration, String status, Long projectId) {
         this.title = title;
         this.user = user;
         this.startDate = startDate;
         this.endDate = endDate;
         this.duration = duration;
         this.status = status;
+        this.projectId = projectId;
     }
+
 
     public Long getProjectId() { return projectId; }
     public void setProjectId(Long projectId) { this.projectId = projectId; }
@@ -72,9 +84,8 @@ public class Task {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public List<Comment> getComments() {return comments;}
-
-    public void setComments(List<Comment> comments) {this.comments = comments;}
+    public List<Comment> getComments() { return comments; }
+    public void setComments(List<Comment> comments) { this.comments = comments; }
 
     public void addComment(Comment comment) {
         this.comments.add(comment);
@@ -85,5 +96,4 @@ public class Task {
         this.comments.remove(comment);
         comment.setTask(null);
     }
-
 }

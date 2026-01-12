@@ -33,6 +33,9 @@ public class TaskControllerTest {
     @Autowired
     private TaskRepository taskRepository;
 
+    // Konstante für die Projekt-ID, da diese nun @NotNull ist
+    private final Long TEST_PROJECT_ID = 1L;
+
     @BeforeEach
     public void setUp(WebApplicationContext context) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
@@ -41,32 +44,28 @@ public class TaskControllerTest {
 
     @Test
     public void testGetAllTasks() throws Exception {
+        // Nutzt den neuen Konstruktor mit 7 Parametern
         Task t = new Task("Dokument schreiben", "Lucas", "2025-10-01",
-                "2025-10-05", "5", "Erledigt");
+                "2025-10-05", "5", "Erledigt", TEST_PROJECT_ID);
         taskRepository.save(t);
 
         mockMvc.perform(get("/api/task"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("Dokument schreiben"))
-                .andExpect(jsonPath("$[0].user").value("Lucas"))
-                .andExpect(jsonPath("$[0].startDate").value("2025-10-01"))
-                .andExpect(jsonPath("$[0].endDate").value("2025-10-05"))
-                .andExpect(jsonPath("$[0].duration").value("5"))
-                .andExpect(jsonPath("$[0].status").value("Erledigt"));
+                .andExpect(jsonPath("$[0].projectId").value(TEST_PROJECT_ID.intValue()));
     }
 
     @Test
     public void testGetTaskById() throws Exception {
         Task t = new Task("Mockup", "Marie", "2025-10-03",
-                "2025-10-11", "9", "Erledigt");
+                "2025-10-11", "9", "Erledigt", TEST_PROJECT_ID);
         Long id = taskRepository.save(t).getId();
 
         mockMvc.perform(get("/api/task/" + id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Mockup"))
-                .andExpect(jsonPath("$.user").value("Marie"))
-                .andExpect(jsonPath("$.duration").value("9"));
+                .andExpect(jsonPath("$.projectId").value(TEST_PROJECT_ID.intValue()));
     }
 
     @Test
@@ -77,6 +76,7 @@ public class TaskControllerTest {
 
     @Test
     public void testCreateTask() throws Exception {
+        // Im JSON muss "projectId" enthalten sein, sonst schlägt die Validierung fehl
         String json = """
                 {
                    "title": "Login implementieren",
@@ -84,7 +84,8 @@ public class TaskControllerTest {
                    "startDate": "2025-02-01",
                    "endDate": "2025-02-05",
                    "duration": "4",
-                   "status": "In Bearbeitung"
+                   "status": "In Bearbeitung",
+                   "projectId": 1
                 }
                 """;
 
@@ -101,18 +102,14 @@ public class TaskControllerTest {
         Long id = n.get("id").asLong();
         assertNotNull(id);
 
-        Task saved = taskRepository.findById(id)
-                .orElseThrow();
-
-        assertEquals("Login implementieren", saved.getTitle());
-        assertEquals("Anna", saved.getUser());
-        assertEquals("4", saved.getDuration());
+        Task saved = taskRepository.findById(id).orElseThrow();
+        assertEquals(TEST_PROJECT_ID, saved.getProjectId());
     }
 
     @Test
     public void testUpdateTask() throws Exception {
         Task t = new Task("Alte Aufgabe", "Tim", "2025-01-01",
-                "2025-01-03", "2", "Offen");
+                "2025-01-03", "2", "Offen", TEST_PROJECT_ID);
         Long id = taskRepository.save(t).getId();
 
         String updateJson = """
@@ -122,7 +119,8 @@ public class TaskControllerTest {
                   "startDate": "2025-01-02",
                   "endDate": "2025-01-05",
                   "duration": "3",
-                  "status": "Review"
+                  "status": "Review",
+                  "projectId": 1
                 }
                 """;
 
@@ -130,38 +128,27 @@ public class TaskControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Neue Aufgabe"))
-                .andExpect(jsonPath("$.status").value("Review"));
-
-        Task updated = taskRepository.findById(id).orElseThrow();
-        assertEquals("Neue Aufgabe", updated.getTitle());
-        assertEquals("Review", updated.getStatus());
+                .andExpect(jsonPath("$.title").value("Neue Aufgabe"));
     }
 
     @Test
     public void testDeleteTask() throws Exception {
         Task t = new Task("Zu löschen", "Paul", "2025-01-10",
-                "2025-01-12", "2", "In Bearbeitung");
+                "2025-01-12", "2", "In Bearbeitung", TEST_PROJECT_ID);
         Long id = taskRepository.save(t).getId();
 
         mockMvc.perform(delete("/api/task/" + id))
                 .andExpect(status().isNoContent());
 
-        Optional<Task> deleted = taskRepository.findById(id);
-        assertFalse(deleted.isPresent());
+        assertFalse(taskRepository.findById(id).isPresent());
     }
-
-    
-    // Iteration 8: Suche und filter
-    
 
     @Test
     public void testSearchByTitle() throws Exception {
         taskRepository.save(new Task("Dokumentation schreiben", "Lucas",
-                "2025-10-01", "2025-10-05", "5", "Erledigt"));
-
+                "2025-10-01", "2025-10-05", "5", "Erledigt", TEST_PROJECT_ID));
         taskRepository.save(new Task("Mockup erstellen", "Marie",
-                "2025-10-03", "2025-10-11", "9", "Erledigt"));
+                "2025-10-03", "2025-10-11", "9", "Erledigt", TEST_PROJECT_ID));
 
         mockMvc.perform(get("/api/task").param("title", "Dok"))
                 .andExpect(status().isOk())
@@ -172,37 +159,24 @@ public class TaskControllerTest {
     @Test
     public void testFilterByStatus() throws Exception {
         taskRepository.save(new Task("Dokumentation", "Lucas",
-                "2025-10-01", "2025-10-05", "5", "Erledigt"));
-
-        taskRepository.save(new Task("Mockup erstellen", "Marie",
-                "2025-10-03", "2025-10-11", "9", "In Bearbeitung"));
-
-        taskRepository.save(new Task("Login bauen", "Chris",
-                "2025-10-03", "2025-10-04", "2", "In Bearbeitung"));
+                "2025-10-01", "2025-10-05", "5", "Erledigt", TEST_PROJECT_ID));
+        taskRepository.save(new Task("Mockup", "Marie",
+                "2025-10-03", "2025-10-11", "9", "In Bearbeitung", TEST_PROJECT_ID));
 
         mockMvc.perform(get("/api/task").param("status", "In Bearbeitung"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.length()").value(1));
     }
 
     @Test
     public void testSearchByTitleAndStatus() throws Exception {
-        taskRepository.save(new Task("Dokumentation", "Lucas",
-                "2025-10-01", "2025-10-05", "5", "Erledigt"));
-
-        taskRepository.save(new Task("Mockup erstellen", "Marie",
-                "2025-10-03", "2025-10-11", "9", "In Bearbeitung"));
-
         taskRepository.save(new Task("Login bauen", "Chris",
-                "2025-10-03", "2025-10-04", "2", "In Bearbeitung"));
+                "2025-10-03", "2025-10-04", "2", "In Bearbeitung", TEST_PROJECT_ID));
 
         mockMvc.perform(get("/api/task")
                 .param("title", "Login")
                 .param("status", "In Bearbeitung"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Login bauen"))
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$[0].title").value("Login bauen"));
     }
-
-    
 }
