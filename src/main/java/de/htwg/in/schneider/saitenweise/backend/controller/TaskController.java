@@ -18,7 +18,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/task")
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class TaskController {
 
     private final TaskRepository taskRepository;
