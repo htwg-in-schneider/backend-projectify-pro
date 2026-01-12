@@ -1,12 +1,10 @@
 package de.htwg.in.schneider.saitenweise.backend.controller;
 
 import java.util.Map;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import de.htwg.in.schneider.saitenweise.backend.model.Role;
 import de.htwg.in.schneider.saitenweise.backend.model.User;
@@ -24,15 +22,14 @@ public class ProfileController {
 
     @GetMapping
     public Map<String, String> profile(@AuthenticationPrincipal Jwt jwt) {
-        String oauthId = jwt.getSubject(); // "sub"
-        String email = jwt.getClaimAsString("email"); // kann null sein, je nach Provider/Scopes
+        String oauthId = jwt.getSubject();
+        String email = jwt.getClaimAsString("email");
         String name = jwt.getClaimAsString("name");
 
         User user = userRepository.findByOauthId(oauthId)
             .map(existing -> {
-                // update nur name/email, Rolle bleibt wie in DB
-                if (email != null) existing.setEmail(email);
-                if (name != null) existing.setName(name);
+                // Bei jedem Login werden E-Mail und Name kurz synchronisiert, falls vorhanden
+                if (email != null && existing.getEmail().contains("@unknown.local")) existing.setEmail(email);
                 return userRepository.save(existing);
             })
             .orElseGet(() -> {
@@ -44,6 +41,28 @@ public class ProfileController {
                 return userRepository.save(u);
             });
 
-        return Map.of("role", user.getRole().name());
+        return Map.of(
+            "name", user.getName(),
+            "email", user.getEmail(),
+            "role", user.getRole().name()
+        );
+    }
+
+    // Endpunkt zum Ändern des Namens
+    @PutMapping("/name")
+    public ResponseEntity<User> updateName(@AuthenticationPrincipal Jwt jwt, @RequestBody Map<String, String> body) {
+        String oauthId = jwt.getSubject();
+        String newName = body.get("name");
+
+        if (newName == null || newName.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return userRepository.findByOauthId(oauthId)
+            .map(user -> {
+                user.setName(newName);
+                return ResponseEntity.ok(userRepository.save(user));
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 }

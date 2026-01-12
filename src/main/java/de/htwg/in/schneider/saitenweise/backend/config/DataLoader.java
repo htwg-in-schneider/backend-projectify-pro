@@ -26,8 +26,8 @@ public class DataLoader {
             
             // --- 1. Spezifische Admins (PRIO 1) ---
             List<UserSeed> priorityUsers = List.of(
-                new UserSeed("Admin", "github|183802963@unknown.local", "github|183802963", Role.ADMIN),
-                new UserSeed("Super Admin", "admin@projectify.pro", "github|164401690", Role.ADMIN)
+                new UserSeed("Katarina (Admin)", "katarina@projectify.local", "github|164401690", Role.ADMIN),
+                new UserSeed("Julian (Admin)", "julian@projectify.local", "github|183802963", Role.ADMIN)
             );
 
             for (UserSeed seed : priorityUsers) {
@@ -56,11 +56,10 @@ public class DataLoader {
             // --- 3. Mitarbeiter laden (PRIO 3) ---
             List<UserSeed> staffMembers = List.of(
 
-                new UserSeed("Goofy", "goofy@projectify.local", "seed-id-goofy", Role.REGULAR),
-                new UserSeed("Max", "max@projectify.local", "seed-id-max", Role.REGULAR),
-                new UserSeed("Moritz", "moritz@projectify.local", "seed-id-moritz", Role.REGULAR),
-                new UserSeed("Siri", "siri@projectify.local", "seed-id-siri", Role.REGULAR),
-                new UserSeed("Alexa", "alexa@projectify.local", "seed-id-alexa", Role.REGULAR)
+                new UserSeed("Goofy Müller", "goofy@projectify.local", "auth0|69651b568e6c51fcb01347ae", Role.REGULAR),
+                new UserSeed("Moritz Flitzer", "moritz@projectify.local", "auth0|696525a79e1902936ced391a", Role.REGULAR),
+                new UserSeed("Alexa Schmidt", "alexa@projectify.local", "auth0|696526199e1902936ced3992", Role.REGULAR),
+                new UserSeed("Maria Kunst", "maria@projectify.local", "auth0|696526fc9e1902936ced3a59", Role.REGULAR)
 
             );
 
