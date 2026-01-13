@@ -16,7 +16,8 @@ public class WebConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-                "http://localhost:5173"
+                "http://localhost:5173",
+                " https://htwg-in-schneider.github.io/frontend-projectify-pro/"
 
         ));
 
