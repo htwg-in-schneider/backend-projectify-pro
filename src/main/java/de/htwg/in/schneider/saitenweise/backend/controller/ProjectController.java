@@ -5,6 +5,7 @@ import de.htwg.in.schneider.saitenweise.backend.model.Role;
 import de.htwg.in.schneider.saitenweise.backend.model.User;
 import de.htwg.in.schneider.saitenweise.backend.repository.ProjectRepository;
 import de.htwg.in.schneider.saitenweise.backend.repository.UserRepository;
+import jakarta.validation.Valid; 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/project")
-//@CrossOrigin(origins = "http://localhost:5173")
 @CrossOrigin(origins = "*")
 public class ProjectController {
 
@@ -28,6 +28,7 @@ public class ProjectController {
         this.userRepository = userRepository;
     }
 
+ 
     private void requireAdmin(Jwt jwt) {
         String oauthId = jwt.getSubject();
         User user = userRepository.findByOauthId(oauthId)
@@ -51,17 +52,18 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody Project project, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Project> createProject(@Valid @RequestBody Project project, @AuthenticationPrincipal Jwt jwt) {
         requireAdmin(jwt);
         project.setId(null);
         if (project.getStatus() == null) project.setStatus("In Bearbeitung");
         return ResponseEntity.status(HttpStatus.CREATED).body(projectRepository.save(project));
     }
 
+
     @PutMapping("/{id}")
     public ResponseEntity<Project> updateProject(
             @PathVariable Long id,
-            @RequestBody Project updated,
+            @Valid @RequestBody Project updated, 
             @AuthenticationPrincipal Jwt jwt) {
         
         requireAdmin(jwt);

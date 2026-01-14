@@ -1,5 +1,9 @@
 package de.htwg.in.schneider.saitenweise.backend.model;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "app_user") 
@@ -7,12 +11,26 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "E-Mail darf nicht leer sein")
+    @Email(message = "Bitte eine gültige E-Mail-Adresse angeben")
+    @Column(nullable = false)
     private String email;
+
+    @NotBlank(message = "Name darf nicht leer sein")
+    @Size(min = 2, max = 50, message = "Der Name muss zwischen 2 und 50 Zeichen lang sein")
+    @Column(nullable = false)
     private String name;
+
+    @NotBlank(message = "OAuth-ID darf nicht leer sein")
     private String oauthId;
 
     @Enumerated(EnumType.STRING) 
     private Role role;
+
+    // Default Constructor
+    public User() {
+    }
 
     // Getters and setters
     public Long getId() {
@@ -42,6 +60,7 @@ public class User {
     public String getOauthId() {
         return oauthId;
     }
+
     public void setOauthId(String oauthId) {
         this.oauthId = oauthId;
     }

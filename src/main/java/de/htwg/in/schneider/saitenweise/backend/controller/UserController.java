@@ -2,8 +2,15 @@ package de.htwg.in.schneider.saitenweise.backend.controller;
 
 import de.htwg.in.schneider.saitenweise.backend.model.User;
 import de.htwg.in.schneider.saitenweise.backend.repository.UserRepository;
+
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,12 +27,35 @@ public class UserController {
     }
 
     /**
-     * Erfüllt Aufgabe 5b: Administrator kann alle Stammdaten (Nutzer) einsehen.
-     * @PreAuthorize stellt sicher, dass nur Nutzer mit der Rolle 'ADMIN' diesen Endpunkt aufrufen können.
+     * 5b
+     * @PreAuthorize 
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+  
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User userDetails) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setName(userDetails.getName());
+                    return ResponseEntity.ok(userRepository.save(user));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        if (!userRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        userRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

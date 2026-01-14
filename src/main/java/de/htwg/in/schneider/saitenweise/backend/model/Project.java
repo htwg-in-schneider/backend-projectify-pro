@@ -2,6 +2,8 @@ package de.htwg.in.schneider.saitenweise.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "project")
@@ -10,12 +12,19 @@ public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
+
+    @NotBlank(message = "Der Projektname darf nicht leer sein.")
+    @Size(min = 3, max = 50, message = "Der Name muss zwischen 1 und 50 Zeichen lang sein.")
     private String name;
+
+    @NotBlank(message = "Ein Status ist erforderlich.")
     private String status;
+
     private String startDate;  
     private String endDate;
+
+    @NotBlank(message = "Bitte geben Sie eine geplante Dauer an.")
     private String duration;
 
     public Project() {
