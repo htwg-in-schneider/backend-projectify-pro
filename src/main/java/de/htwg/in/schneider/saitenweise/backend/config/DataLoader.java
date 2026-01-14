@@ -32,17 +32,16 @@ public class DataLoader {
             );
 
             for (UserSeed seed : priorityUsers) {
-                createOrUpdateUser(userRepository, seed); // Neue Methode aufrufen
+                createOrUpdateUser(userRepository, seed); 
             }
 
-            // --- 2. Admins aus application.properties ---
+            // --- Admins from application.properties ---
             if (adminOauthIds != null && !adminOauthIds.isBlank()) {
                 Arrays.stream(adminOauthIds.split(","))
                     .map(String::trim)
                     .filter(s -> !s.isBlank())
                     .forEach(oauthId -> {
-                        // Hier belassen wir es oft beim 'createIfMissing', 
-                        // oder du passt es auch an, wenn du willst.
+
                         if (userRepository.findByOauthId(oauthId).isEmpty()) {
                             User created = new User();
                             created.setOauthId(oauthId);
@@ -55,7 +54,7 @@ public class DataLoader {
                     });
             }
 
-            // --- 3. Mitarbeiter laden ---
+            // --- worker loading ---
             List<UserSeed> staffMembers = List.of(
                 new UserSeed("Goofy Müller", "goofy@projectify.local", "auth0|69651b568e6c51fcb01347ae", Role.REGULAR),
                 new UserSeed("Moritz Flitzer", "moritz@projectify.local", "auth0|696525a79e1902936ced391a", Role.REGULAR),
@@ -64,17 +63,16 @@ public class DataLoader {
             );
 
             for (UserSeed staff : staffMembers) {
-                createOrUpdateUser(userRepository, staff); // Neue Methode aufrufen
+                createOrUpdateUser(userRepository, staff); 
             }
         };
     }
 
-    // WICHTIG: Die angepasste Logik
     private void createOrUpdateUser(UserRepository repo, UserSeed seed) {
         Optional<User> existingOpt = repo.findByOauthId(seed.oauthId);
 
         if (existingOpt.isEmpty()) {
-            // FALL 1: Nutzer existiert noch nicht -> Neu anlegen
+            // new create user
             User user = new User();
             user.setOauthId(seed.oauthId);
             user.setName(seed.name);
@@ -83,11 +81,11 @@ public class DataLoader {
             repo.save(user);
             System.out.println("User angelegt: " + seed.name);
         } else {
-            // FALL 2: Nutzer existiert schon -> Daten aktualisieren (Sync)
+            // user dont exist
             User user = existingOpt.get();
             boolean changed = false;
 
-            // Prüfen, ob sich was geändert hat, um unnötige DB-Writes zu sparen
+            // try if anything changed
             if (!user.getName().equals(seed.name)) {
                 user.setName(seed.name);
                 changed = true;

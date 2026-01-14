@@ -28,7 +28,6 @@ public class ProfileController {
 
         User user = userRepository.findByOauthId(oauthId)
             .map(existing -> {
-                // Bei jedem Login werden E-Mail und Name kurz synchronisiert, falls vorhanden
                 if (email != null && existing.getEmail().contains("@unknown.local")) existing.setEmail(email);
                 return userRepository.save(existing);
             })
@@ -48,7 +47,7 @@ public class ProfileController {
         );
     }
 
-    // Endpunkt zum Ändern des Namens
+    //change name
     @PutMapping("/name")
     public ResponseEntity<User> updateName(@AuthenticationPrincipal Jwt jwt, @RequestBody Map<String, String> body) {
         String oauthId = jwt.getSubject();

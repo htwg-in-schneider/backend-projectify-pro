@@ -76,7 +76,6 @@ public class TaskControllerTest {
 
     @Test
     public void testCreateTask() throws Exception {
-        // Im JSON muss "projectId" enthalten sein, sonst schlägt die Validierung fehl
         String json = """
                 {
                    "title": "Login implementieren",

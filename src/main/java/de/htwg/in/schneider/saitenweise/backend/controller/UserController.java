@@ -26,9 +26,6 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Gibt alle Nutzer zurück. Nur für Admins.
-     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
@@ -36,19 +33,16 @@ public class UserController {
     }
 
     /**
-     * Aktualisiert einen Nutzer (Name, Email, Rolle).
+     * update user (name, email, role).
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User userDetails) {
         return userRepository.findById(id)
                 .map(user -> {
-                    // WICHTIG: Alle änderbaren Felder müssen hier explizit gesetzt werden!
                     user.setName(userDetails.getName());
-                    user.setEmail(userDetails.getEmail()); // Fehlte vorher
-                    user.setRole(userDetails.getRole());   // Fehlte vorher
-                    
-                    // OAuth-ID ändern wir nicht, da sie der Anker für den Login ist.
+                    user.setEmail(userDetails.getEmail()); 
+                    user.setRole(userDetails.getRole());   
                     
                     return ResponseEntity.ok(userRepository.save(user));
                 })
@@ -56,7 +50,7 @@ public class UserController {
     }
 
     /**
-     * Löscht einen Nutzer.
+     * delet user
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
