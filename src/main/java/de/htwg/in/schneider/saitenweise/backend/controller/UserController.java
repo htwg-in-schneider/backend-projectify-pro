@@ -26,29 +26,38 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Gibt alle Nutzer zurück. Nur für Admins.
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    /**
+     * Aktualisiert einen Nutzer (Name, Email, Rolle).
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User userDetails) {
         return userRepository.findById(id)
                 .map(user -> {
-                    // KORREKTUR: Alle änderbaren Felder übernehmen
+                    // WICHTIG: Alle änderbaren Felder müssen hier explizit gesetzt werden!
                     user.setName(userDetails.getName());
-                    user.setEmail(userDetails.getEmail()); // E-Mail Update hinzufügen
-                    user.setRole(userDetails.getRole());   // Rollen/Status Update hinzufügen
+                    user.setEmail(userDetails.getEmail()); // Fehlte vorher
+                    user.setRole(userDetails.getRole());   // Fehlte vorher
                     
-                    // OAuth-ID sollte in der Regel NICHT geändert werden, da sie der Identifikator ist.
+                    // OAuth-ID ändern wir nicht, da sie der Anker für den Login ist.
                     
                     return ResponseEntity.ok(userRepository.save(user));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Löscht einen Nutzer.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
