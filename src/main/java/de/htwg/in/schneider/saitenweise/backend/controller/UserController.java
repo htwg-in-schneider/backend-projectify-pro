@@ -26,28 +26,28 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    /**
-     * 5b
-     * @PreAuthorize 
-     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-  
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User userDetails) {
         return userRepository.findById(id)
                 .map(user -> {
+                    // KORREKTUR: Alle änderbaren Felder übernehmen
                     user.setName(userDetails.getName());
+                    user.setEmail(userDetails.getEmail()); // E-Mail Update hinzufügen
+                    user.setRole(userDetails.getRole());   // Rollen/Status Update hinzufügen
+                    
+                    // OAuth-ID sollte in der Regel NICHT geändert werden, da sie der Identifikator ist.
+                    
                     return ResponseEntity.ok(userRepository.save(user));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")

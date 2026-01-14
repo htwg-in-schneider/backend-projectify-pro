@@ -46,30 +46,6 @@ public class CommentController {
         return ResponseEntity.ok(commentRepository.findByTaskId(taskId));
     }
 
-
-/*     @PostMapping("/task/{taskId}")
-    public ResponseEntity<?> createCommentForTask(
-            @PathVariable Long taskId,
-            @RequestBody Comment comment) {
-
-        LOG.info("Creating comment for task {}", taskId);
-
-        Optional<Task> taskOpt = taskRepository.findById(taskId);
-        if (taskOpt.isEmpty()) {
-            LOG.warn("Task {} not found", taskId);
-            return ResponseEntity.notFound().build();
-        }
-
-        Task task = taskOpt.get();
-        comment.setTask(task);
-
-        Comment saved = commentRepository.save(comment);
-        LOG.info("Created comment {} for task {}", saved.getId(), taskId);
-
-        return ResponseEntity.status(201).body(saved);
-    }
- */
-
     @PostMapping
     public ResponseEntity<?> createComment(@RequestBody Comment comment) {
 
