@@ -15,22 +15,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) 
-            .cors(Customizer.withDefaults()) 
+            .csrf(csrf -> csrf.disable())
+            .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
-
                 .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers("/api/users/**").authenticated()
-                .requestMatchers("/api/projects/**").authenticated()
-                .requestMatchers("/api/task/**").authenticated()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter()))
+                .jwt(Customizer.withDefaults())
             );
 
         return http.build();
     }
-
 }
