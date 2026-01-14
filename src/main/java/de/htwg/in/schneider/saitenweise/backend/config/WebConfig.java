@@ -17,8 +17,7 @@ public class WebConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                " https://htwg-in-schneider.github.io/frontend-projectify-pro/"
-
+                "https://htwg-in-schneider.github.io"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
