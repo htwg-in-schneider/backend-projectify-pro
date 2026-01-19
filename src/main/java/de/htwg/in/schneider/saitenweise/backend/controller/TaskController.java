@@ -18,7 +18,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/task")
-
 @CrossOrigin(origins = "*")
 public class TaskController {
 
@@ -78,14 +77,14 @@ public class TaskController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /* ================= WRITE (ADMIN ONLY) ================= */
+    /* ================= WRITE ================= */
 
     @PostMapping
     public ResponseEntity<Task> createTask(
             @Valid @RequestBody Task task, 
             @AuthenticationPrincipal Jwt jwt) {
 
-        requireAdmin(jwt);
+        requireAdmin(jwt); 
         task.setId(null);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(taskRepository.save(task));
@@ -97,17 +96,23 @@ public class TaskController {
             @Valid @RequestBody Task updated, 
             @AuthenticationPrincipal Jwt jwt) {
 
-        requireAdmin(jwt);
+        String oauthId = jwt.getSubject();
+        User currentUser = userRepository.findByOauthId(oauthId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
 
         return taskRepository.findById(id)
                 .map(existing -> {
-                    existing.setTitle(updated.getTitle());
-                    existing.setUser(updated.getUser());
-                    existing.setStartDate(updated.getStartDate());
-                    existing.setEndDate(updated.getEndDate());
-                    existing.setDuration(updated.getDuration());
+                    if (currentUser.getRole() == Role.ADMIN) {
+                        existing.setTitle(updated.getTitle());
+                        existing.setUser(updated.getUser());
+                        existing.setStartDate(updated.getStartDate());
+                        existing.setEndDate(updated.getEndDate());
+                        existing.setDuration(updated.getDuration());
+                        existing.setProjectId(updated.getProjectId()); 
+                    }
+                    
                     existing.setStatus(updated.getStatus());
-                    existing.setProjectId(updated.getProjectId()); 
+                    
                     return ResponseEntity.ok(taskRepository.save(existing));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
